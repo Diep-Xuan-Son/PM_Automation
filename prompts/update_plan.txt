@@ -1,0 +1,14 @@
+Your goal is : {goal}
+You previously made a plan, agents are currently working on it.
+The last agent working on task: {id}, did the following work:
+{last_agent_work}
+Agent {id} work was a {tool_success_str} according to system interpreter.
+{next_task}
+Is the work done for task {id} leading to success or failure ? Did an agent fail with a task?
+If agent work was good: answer "NO_UPDATE"
+If agent work is leading to failure: update the plan.
+If a task failed add a task to try again or recover from failure. You might have near identical task twice.
+plan should be within ```json like before.
+You need to rewrite the whole plan, but only change the tasks after task {id}.
+Make the plan the same length as the original one or with only one additional step.
+Do not change past tasks. Change next tasks.
