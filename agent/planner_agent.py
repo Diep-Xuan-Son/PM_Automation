@@ -34,8 +34,6 @@ class PlanState(TypedDict):
     past_steps: List[Tuple]
     memory: str
     status: str
-    user_id: str
-    session_id: str
     task_result: Dict
     response: str
 
@@ -43,7 +41,7 @@ class PlannerAgent():
     def __init__(
         self,
         model: str="gpt-4o-mini",
-        prompt_path: str="/home/mq/disk2T/son/code/GitHub/test/cua/libs/python/agent/prompts/planner_agent.txt",
+        prompt_path: str="/home/mq/disk2T/son/code/GitHub/project_management/prompts/planner_agent.txt",
         **kwargs
     ):
         """
@@ -145,6 +143,30 @@ class PlannerAgent():
             raise PermissionError(f"Permission denied to read prompt file at path: {file_path}")
         except Exception as e:
             raise e
+
+    def make_prompt(self, task: str, agent_infos_dict: dict) -> str:
+        """
+        Generates a prompt for the agent based on the task and previous agents work information.
+        Args:
+            task (str): The task to be performed.
+            agent_infos_dict (dict): A dictionary containing information from other agents.
+        Returns:
+            str: The formatted prompt for the agent.
+        """
+        infos = ""
+        if agent_infos_dict is None or len(agent_infos_dict) == 0:
+            infos = "No needed informations."
+        else:
+            for agent_id, info in agent_infos_dict.items():
+                infos += f"\t- According to agent {agent_id}:\n{info}\n\n"
+        prompt = f"""
+        You are given informations from your AI friends work:
+        {infos}
+        Your task is:
+        {task}
+        """
+        self.logger.info(f"Prompt for agent:\n{prompt}")
+        return prompt
 
     def make_plan(self, state: PlanState):
         answer = self.planner_agent.invoke({"messages": [{"role": "user", "content": state["goal"]}]})
@@ -251,6 +273,6 @@ class PlannerAgent():
 
 if __name__=="__main__":
     plagent = PlannerAgent()
-    # result = asyncio.run(plagent.process("u1", "s1", "Tôi muốn phân tích khả năng của ứng viên từ file cv_ungvien.txt"))
-    # # plagent.sync_process("u1", "s1", "Tôi muốn phân tích khả năng của ứng viên từ file cv_ungvien.txt")
+    # result = asyncio.run(plagent.process("planner_agent_u1", "planner_agent_s1", "Tôi muốn phân tích khả năng của ứng viên từ file cv_ungvien.txt"))
+    # # plagent.sync_process("planner_agent_u1", "planner_agent_s1", "Tôi muốn phân tích khả năng của ứng viên từ file cv_ungvien.txt")
     # print(result)
