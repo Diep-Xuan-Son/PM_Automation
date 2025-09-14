@@ -74,7 +74,8 @@ class Tools():
 
     def create_work_dir(self):
         """Create the work directory if it does not exist."""
-        default_path = os.path.dirname(os.getcwd())
+        # default_path = os.path.dirname(os.getcwd())
+        default_path = str(ROOT)
         if self.config_exists():
             self.config.read('./config.ini')
             workdir_path = self.safe_get_work_dir_path()
