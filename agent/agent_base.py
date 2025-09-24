@@ -16,12 +16,26 @@ from datetime import datetime
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 from libs.utils import get_logger
+from typing import Dict, List, Any, Optional, AsyncGenerator, Union, cast, Callable, Set, Tuple
+from typing_extensions import TypedDict
 
 # from sources.memory import Memory
 # from sources.utility import pretty_print
 # from sources.schemas import executorResult
 
 random.seed(time.time())
+
+class AgentState(TypedDict):
+    goal: str
+    task_id: str
+    agent_tasks: List
+    prompt: str 
+    sender_id: str
+    session_id: str
+    answer: Optional[str | List | Dict]
+    success: bool
+    current_step: int
+    agents_work_result: Dict
 
 class Agent():
     """
@@ -54,7 +68,7 @@ class Agent():
         self.verbose = verbose
         self.executor = ThreadPoolExecutor(max_workers=1)
 
-        self.logger = get_logger(name, level="INFO", handler_type=log_type, filename=f"{ROOT}/logs/{name.lower().replace(" ", "_")}_{datetime.now().strftime('%Y_%m_%d')}.log")
+        self.logger = get_logger(name, level="INFO", handler_type=log_type, filename=f"{ROOT}/logs/{name.lower().replace(' ' , '_')}_{datetime.now().strftime('%Y_%m_%d')}.log")
     
     @property
     def get_agent_name(self) -> str:

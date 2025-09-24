@@ -26,6 +26,7 @@ from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.types import Command
 
 from libs.utils import get_logger
+from agent.agent_base import AgentState
 
 class CasualState(TypedDict):
     message: str
@@ -46,7 +47,6 @@ class CasualAgent():
         dotenv.load_dotenv()
         self.name = "Casual Agent"
         self.role = "talk"
-        self.work_dir = os.path.join(self.tools["file_finder"].get_work_dir(), 'data_test')
         self.postgres_url = postgres_url
         llm = ChatOpenAI(model=model, api_key=jwt.decode(os.getenv("OPENAI_API_KEY"), os.getenv("SECRET_KEY"), algorithms=["HS256"])["api_key"], streaming=True)
         self.file_agent = create_react_agent(
@@ -78,7 +78,10 @@ class CasualAgent():
         # self.logger.info(f"----answer: {answer}")
         return {"answer": answer["messages"][-1].content, "memory": state["memory"]}
 
-    def sync_process(self, sender_id: str, session_id: str, prompt: str) -> str:
+    def sync_process(self, state: AgentState) -> str:
+        sender_id = state["sender_id"]
+        session_id = state["session_id"]
+        prompt = state["prompt"]
         with (
             PostgresSaver.from_conn_string(self.postgres_url) as checkpointer,
         ):
@@ -103,14 +106,14 @@ class CasualAgent():
             for s in file_graph.stream(inputs, config=config):
                 self.logger.info(s)
             answer = s["call_llm"]["answer"]
+            success = True
 
-            return answer
+            return {"answer": answer, "success": success}
 
-    async def process(self, sender_id: str, session_id: str, prompt: str):
+    async def process(self, state: AgentState):
         self.status_message = "Thinking..."
         loop = asyncio.get_event_loop()
-        kwargs = {"sender_id": sender_id, "session_id": session_id, "prompt": prompt}
-        return await loop.run_in_executor(self.executor, lambda: self.sync_process(**kwargs))
+        return await loop.run_in_executor(self.executor, lambda: self.sync_process(state))
 
 # async def main():
 #     history = [{"role": "user", "content": "tính tổng của 1 và 2"}]
@@ -125,6 +128,7 @@ if __name__=="__main__":
     Your task is:
     Đọc nội dung của file cv.md và trả lại nội dung.
     """
-    result = asyncio.run(agent.process("casual_agent_u1", "casual_agent_s1", prompt))
+    state = AgentState(prompt=prompt, sender_id="file_agent_u1", session_id="file_agent_s1")
+    result = asyncio.run(agent.process(state))
     # agent.sync_process("u1", "s1", "Tôi muốn phân tích khả năng của ứng viên từ file cv_ungvien.txt")
     print(result)

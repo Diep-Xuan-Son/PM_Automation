@@ -4,7 +4,7 @@ FILE = Path(__file__).resolve()
 DIR = FILE.parents[0]
 ROOT = FILE.parents[1]
 if str(ROOT) not in sys.path:
-    sys.path.append(str(ROOT))
+    sys.path.insert(0, str(ROOT))
 
 import os
 import asyncio
@@ -26,7 +26,9 @@ from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.types import Command
 
 from libs.utils import get_logger
-from tools.fileFinder import FileFinder, BashInterpreter
+from tools.fileFinder import FileFinder
+from tools.BashInterpreter import BashInterpreter
+from agent.agent_base import AgentState
 
 class FileState(TypedDict):
     message: str
@@ -86,8 +88,8 @@ class FileAgent():
         return {"answer": answer["messages"][-1].content, "memory": state["memory"]}
 
     def execute_modules(self, state: FileState):
+        feedbacks = ""
         for name, tool in self.tools.items():
-            feedback = ""
             blocks, save_path = tool.load_exec_block(state["answer"])
 
             if blocks:
@@ -101,7 +103,9 @@ class FileAgent():
                 state["memory"].append({"role": "user", "content": feedback})
                 if save_path != None:
                     tool.save_block(blocks, save_path)
-        return {"memory": state["memory"], "success": True, "feedback": feedback, "answer": state["answer"]}
+                # print(f"----feedback: {feedback}")
+                feedbacks += f"{name}: {feedback}"
+        return {"memory": state["memory"], "success": True, "feedback": feedbacks, "answer": state["answer"]}
 
     def remove_blocks(self, text: str) -> str:
         """
@@ -124,7 +128,10 @@ class FileAgent():
                 block_idx += 1
         return "\n".join(post_lines)
 
-    def sync_process(self, sender_id: str, session_id: str, prompt: str) -> str:
+    def sync_process(self, state: AgentState) -> str:
+        sender_id = state["sender_id"]
+        session_id = state["session_id"]
+        prompt = state["prompt"]
         with (
             PostgresSaver.from_conn_string(self.postgres_url) as checkpointer,
         ):
@@ -150,16 +157,17 @@ class FileAgent():
             inputs = {"message": prompt, "memory": []}
             for s in file_graph.stream(inputs, config=config):
                 self.logger.info(s)
-            answer = s["execute_modules"]["answer"]
-            answer = self.remove_blocks(answer)
+            answer = s["execute_modules"]["feedback"]
+            success = s["execute_modules"]["success"]
+            # answer = self.remove_blocks(answer)
 
-            return answer
+            return {"answer": answer, "success": success}
 
-    async def process(self, sender_id: str, session_id: str, prompt: str):
+    # async def process(self, sender_id: str, session_id: str, prompt: str):
+    async def process(self, state: AgentState):
         self.status_message = "Thinking..."
         loop = asyncio.get_event_loop()
-        kwargs = {"sender_id": sender_id, "session_id": session_id, "prompt": prompt}
-        return await loop.run_in_executor(self.executor, lambda: self.sync_process(**kwargs))
+        return await loop.run_in_executor(self.executor, lambda: self.sync_process(state))
 
 # async def main():
 #     history = [{"role": "user", "content": "tính tổng của 1 và 2"}]
@@ -174,6 +182,7 @@ if __name__=="__main__":
     Your task is:
     Đọc nội dung của file cv.md và trả lại nội dung.
     """
-    result = asyncio.run(agent.process("file_agent_u1", "file_agent_s1", prompt))
+    state = AgentState(prompt=prompt, sender_id="file_agent_u1", session_id="file_agent_s1")
+    result = asyncio.run(agent.process(state))
     # agent.sync_process("u1", "s1", "Tôi muốn phân tích khả năng của ứng viên từ file cv_ungvien.txt")
     print(result)

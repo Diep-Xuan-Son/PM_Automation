@@ -26,14 +26,25 @@ from langgraph.graph import StateGraph, MessagesState, START, END
 from langgraph.types import Command
 
 from libs.utils import get_logger
+from agent.file_agent import FileAgent
+from agent.casual_agent import CasualAgent
+from agent.agent_base import AgentState
 
+class ProcessState(TypedDict):
+    goal: str
+    prompt: str
+    tasks: List[str]
+    task_id: str
+    task_result: Dict
+    memory: str
+    success: str
+    response: str
 
 class PlanState(TypedDict):
     goal: str
     tasks: List[str]
     past_steps: List[Tuple]
     memory: str
-    status: str
     task_result: Dict
     response: str
 
@@ -58,10 +69,10 @@ class PlannerAgent():
             name="planner_agent",
         )
         self.agents = {
-            "coder": "",
-            "file": "",
-            "web": "",
-            "casual": ""
+            # "coder": "",
+            "file_agent": FileAgent(),
+            # "web": "",
+            "casual_agent": CasualAgent()
         }
         self.executor = ThreadPoolExecutor(max_workers=1)
 
@@ -168,44 +179,160 @@ class PlannerAgent():
         self.logger.info(f"Prompt for agent:\n{prompt}")
         return prompt
 
-    def make_plan(self, state: PlanState):
-        answer = self.planner_agent.invoke({"messages": [{"role": "user", "content": state["goal"]}]})
+    def make_plan(self, state: PlanState|AgentState):
+        # print(state)
+        state["memory"].append({"role": "user", "content": state["goal"]})
+        answer = self.planner_agent.invoke({"messages": state["memory"]})
         # self.logger.info(f"----answer: {answer}")
-        agents_tasks = self.parse_agent_tasks(answer["messages"][-1].content)
-        return {"tasks": agents_tasks}
+        agent_tasks = self.parse_agent_tasks(answer["messages"][-1].content)
+        return {"tasks": agent_tasks, "memory": state["memory"]}
 
-    async def update_plan(self, goal: str, agents_tasks: List[dict], agents_work_result: dict, id: str, success: bool):
-        self.status_message = "Updating plan..."
+    def update_plan(self, state: AgentState):
+        i = state["current_step"] + 1
+        goal = state["goal"]
+        id = state["task_id"]
+        success = state["success"]
+        agent_tasks = state["agent_tasks"]
+        agent_answer = state["answer"] + "\nAgent succeeded with task." if success else "\nAgent failed with task (Error detected)."
+        agents_work_result = {id: agent_answer}
+        
+        self.logger.info("Updating plan...")
         last_agent_work = agents_work_result[id]
         tool_success_str = "success" if success else "failure"
         try:
             id_int = int(id)
         except Exception as e:
-            return agents_tasks
-        if id_int == len(agents_tasks):
+            return {"agent_tasks": agent_tasks, "current_step": i, "agents_work_result": agents_work_result}
+        if id_int == len(agent_tasks):
             next_task = "No task follow, this was the last step. If it failed add a task to recover."
         else:
-            next_task = f"Next task is: {agents_tasks[int(id)][0]}."
+            next_task = f"Next task is: {agent_tasks[int(id)][0]}."
 
         update_prompt = self.load_prompt(f"{ROOT}/prompts/update_plan.txt").format(goal=goal, id=id, last_agent_work=last_agent_work, tool_success_str=tool_success_str, next_task=next_task, )
-        plan = await self.make_plan(update_prompt)["tasks"]
+        plan = self.make_plan({"goal": update_prompt, "memory": []})["tasks"]
         if plan == []:
-            return agents_tasks
+            return {"agent_tasks": agent_tasks, "current_step": i, "agents_work_result": agents_work_result}
         self.logger.info(f"Plan updated:\n{plan}")
-        return plan
+        return {"agent_tasks": plan, "current_step": i, "agents_work_result": agents_work_result}
     
     def get_work_result_agent(self, task_needs, agents_work_result):
         res = {k: agents_work_result[k] for k in task_needs if k in agents_work_result}
         self.logger.info(f"Next agent needs: {task_needs}.\n Match previous agent result: {res}")
         return res
 
+    # def start_agent_process(self, task: dict, required_infos: dict | None) -> str:
+    #     """
+    #     Starts the agent process for a given task.
+    #     Args:
+    #         task (dict): The task to be performed.
+    #         required_infos (dict | None): The required information for the task.
+    #     Returns:
+    #         str: The result of the agent process.
+    #     """
+    #     self.status_message = f"Starting task {task['task']}..."
+    #     agent_prompt = self.make_prompt(task['task'], required_infos)
+    #     print(f"Agent {task['agent']} started working...")
+    #     self.logger.info(f"Agent {task['agent']} started working on {task['task']}.")
+    #     answer = self.agents[task['agent'].lower()].process(agent_prompt, None)
+    #     # self.last_answer = answer
+    #     # self.last_reasoning = reasoning
+    #     self.blocks_result = self.agents[task['agent'].lower()].blocks_result
+    #     agent_answer = self.agents[task['agent'].lower()].raw_answer_blocks(answer)
+    #     success = self.agents[task['agent'].lower()].get_success
+    #     self.agents[task['agent'].lower()].show_answer()
+    #     _print(f"Agent {task['agent']} completed task.")
+    #     self.logger.info(f"Agent {task['agent']} finished working on {task['task']}. Success: {success}")
+    #     agent_answer += "\nAgent succeeded with task." if success else "\nAgent failed with task (Error detected)."
+    #     return agent_answer, success
+    
+    def init_agent(self, state: AgentState):
+        required_infos = None
+        # agents_work_result = dict()
+        agents_work_result = state["agents_work_result"]
+        i = state["current_step"]
+        task_name, task = state['agent_tasks'][i][0], state['agent_tasks'][i][1]
+        
+        if agents_work_result is not None:
+            required_infos = self.get_work_result_agent(task['need'], agents_work_result)
+        agent_prompt = self.make_prompt(task['task'], required_infos)
+        return {"prompt": agent_prompt, "task_id": task['id']}
+    
+    def check_step(self, state: AgentState):
+        i = state["current_step"]
+        steps = len(state["agent_tasks"])
+        if i < steps:
+            return True
+        else:
+            return False
+        
+    def check_agent(self, state: AgentState):
+        i = state["current_step"]
+        task_name, task = state['agent_tasks'][i][0], state['agent_tasks'][i][1]
+        return task['agent'].lower()
+    
+    def get_answer(self, state: AgentState):
+        return {"agent_tasks": state["agent_tasks"], "answer": state["answer"]}
+
+    def start_agent_process(self, sender_id: str, session_id: str, goal:str, agent_tasks: list, ) -> str:
+        # required_infos = None
+        agents_work_result = dict()
+        i = 0
+        steps = len(agent_tasks)
+        with (
+            PostgresSaver.from_conn_string(self.postgres_url) as checkpointer,
+        ):
+            # while i < steps:
+            if i < steps:
+                # task_name, task = agent_tasks[i][0], agent_tasks[i][1]
+                # if agents_work_result is not None:
+                #     required_infos = self.get_work_result_agent(task['need'], agents_work_result)
+
+                # agent_prompt = self.make_prompt(task['task'], required_infos)
+                process_builder = StateGraph(AgentState)
+                process_builder.add_node("init_agent", self.init_agent)
+                # process_builder.add_node("process", self.agents[task['agent'].lower()].sync_process)
+                process_builder.add_node("file_agent", self.agents["file_agent"].sync_process)
+                process_builder.add_node("casual_agent", self.agents["casual_agent"].sync_process)
+                process_builder.add_node("update", self.update_plan)
+                process_builder.add_node("get_answer", self.get_answer)
+                # process_builder.add_edge(START, "process")
+                # process_builder.add_edge("process", "update")
+                # process_builder.add_edge('update', END)
+                process_builder.add_edge(START, "init_agent")
+                process_builder.add_conditional_edges("init_agent", self.check_agent)
+                process_builder.add_edge("file_agent", "update")
+                process_builder.add_edge("casual_agent", "update")
+                process_builder.add_conditional_edges('update', self.check_step, {True: "init_agent", False: "get_answer"})
+                process_builder.add_edge("get_answer", END)
+
+                process_graph = process_builder.compile(
+                    checkpointer=checkpointer
+                )
+                config = {
+                    "recursion_limit": 50, 
+                    "configurable": {
+                        "thread_id": session_id,
+                        "user_id": sender_id,
+                    }
+                }
+                inputs = {"goal": goal, "sender_id": sender_id, "session_id": session_id, "agent_tasks": agent_tasks, "current_step": i, "agents_work_result": agents_work_result}
+                answer = ""
+                for s in process_graph.stream(inputs, config=config):
+                    self.logger.info(s)
+                # steps = len(s["update"]["agent_tasks"])
+                # i += 1
+                answer = s["get_answer"]["answer"]
+                agent_tasks = s["get_answer"]["agent_tasks"]
+                return answer, agent_tasks
+            return "Cannot handle the process", agent_tasks
+
     def sync_process(self, sender_id: str, session_id: str, goal: str) -> str:
-        # agents_tasks = []
+        # agent_tasks = []
         # required_infos = None
         # agents_work_result = dict()
 
-        self.status_message = "Making a plan..."
-        # agents_tasks = await self.make_plan(goal)
+        self.logger.info("Making a plan...")
+        # agent_tasks = await self.make_plan(goal)
         with (
             PostgresStore.from_conn_string(self.postgres_url) as store,
             PostgresSaver.from_conn_string(self.postgres_url) as checkpointer,
@@ -217,8 +344,9 @@ class PlannerAgent():
                 self.logger.info(f"----namespace: {namespace}")
                 memories = store.search(namespace, query=str(state["goal"]))
                 info = "\n".join([d.value["data"] for d in memories])
+                memory = [{"role": "assistant", "content": info}]
                 # self.logger.info(f"----info: {info}")
-                return {"memory": info}
+                return {"memory": memory}
         
             make_plan_builder = StateGraph(PlanState)
             make_plan_builder.add_node("get_memory", get_memory)
@@ -243,25 +371,11 @@ class PlannerAgent():
                 self.logger.info(s)
             agent_tasks = s["make_plan"]["tasks"]
 
-            # i = 0
-            # steps = len(agents_tasks)
-            # while i < steps:
-            #     task_name, task = agent_tasks[i][0], agent_tasks[i][1]
-            #     self.status_message = "Starting agents..."
-            #     if agents_work_result is not None:
-            #         required_infos = self.get_work_result_agent(task['need'], agents_work_result)
-            #     try:
-            #         answer, success = await self.start_agent_process(task, required_infos)
-            #     except Exception as e:
-            #         raise e
-            #     agents_work_result[task['id']] = answer
-            #     agents_tasks = await self.update_plan(goal, agents_tasks, agents_work_result, task['id'], success)
-            #     steps = len(agents_tasks)
-            #     i += 1
+            answer, agent_tasks = self.start_agent_process(sender_id, session_id, goal, agent_tasks)
             return agent_tasks
 
     async def process(self, sender_id: str, session_id: str, goal: str):
-        self.status_message = "Thinking..."
+        self.logger.info("Thinking...")
         loop = asyncio.get_event_loop()
         kwargs = {"sender_id": sender_id, "session_id": session_id, "goal": goal}
         return await loop.run_in_executor(self.executor, lambda: self.sync_process(**kwargs))
@@ -273,6 +387,6 @@ class PlannerAgent():
 
 if __name__=="__main__":
     plagent = PlannerAgent()
-    # result = asyncio.run(plagent.process("planner_agent_u1", "planner_agent_s1", "Tôi muốn phân tích khả năng của ứng viên từ file cv_ungvien.txt"))
-    # # plagent.sync_process("planner_agent_u1", "planner_agent_s1", "Tôi muốn phân tích khả năng của ứng viên từ file cv_ungvien.txt")
-    # print(result)
+    result = asyncio.run(plagent.process("planner_agent_u1", "planner_agent_s1", "Tôi muốn phân tích khả năng của ứng viên từ file cv.md"))
+    # plagent.sync_process("planner_agent_u1", "planner_agent_s1", "Tôi muốn phân tích khả năng của ứng viên từ file cv_ungvien.txt")
+    print(result)
