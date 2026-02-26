@@ -1,0 +1,10 @@
+adaptive-classifier
+langid
+psycopg[binary]
+sentencePiece
+sacremoses
+celery
+eventlet 
+
+langgraph
+langgraph-checkpoint-postgres

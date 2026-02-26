@@ -1,0 +1,580 @@
+{
+    "example": [
+        [
+            "Write a python script to check if the device on my network is connected to the internet",
+            "code"
+        ],
+        [
+            "Hey could you search the web for the latest news on the tesla stock market ?",
+            "web"
+        ],
+        [
+            "I would like you to search for weather api",
+            "web"
+        ],
+        [
+            "Plan a 3-day trip to New York, including flights and hotels.",
+            "web"
+        ],
+        [
+            "Find on the web the latest research papers on AI.",
+            "web"
+        ],
+        [
+            "Can you debug this Java code? It\u2019s not working.",
+            "code"
+        ],
+        [
+            "Can you browse the web and find me a 4090 for cheap?",
+            "web"
+        ],
+        [
+            "i would like to setup a new AI project, index as mark2",
+            "files"
+        ],
+        [
+            "Hey, can you find the old_project.zip file somewhere on my drive?",
+            "files"
+        ],
+        [
+            "Tell me a funny story",
+            "talk"
+        ],
+        [
+            "can you make a snake game in python",
+            "code"
+        ],
+        [
+            "Can you locate the backup folder I created last month on my system?",
+            "files"
+        ],
+        [
+            "Share a random fun fact about space.",
+            "talk"
+        ],
+        [
+            "Write a script to rename all files in a directory to lowercase.",
+            "files"
+        ],
+        [
+            "Could you check if the presentation.pdf file exists in my downloads?",
+            "files"
+        ],
+        [
+            "Tell me about the weirdest dream you\u2019ve ever heard of.",
+            "talk"
+        ],
+        [
+            "Search my drive for a file called vacation_photos_2023.jpg.",
+            "files"
+        ],
+        [
+            "Help me organize my desktop files into folders by type.",
+            "files"
+        ],
+        [
+            "What\u2019s your favorite movie and why?",
+            "talk"
+        ],
+        [
+            "what directory are you in ?",
+            "files"
+        ],
+        [
+            "what files you seing rn ?",
+            "files"
+        ],
+        [
+            "When is the period of university exam in france ?",
+            "web"
+        ],
+        [
+            "Search my drive for a file named budget_2024.xlsx",
+            "files"
+        ],
+        [
+            "Write a Python function to sort a list of dictionaries by key",
+            "code"
+        ],
+        [
+            "Find the latest updates on quantum computing on the web",
+            "web"
+        ],
+        [
+            "Check if the folder \u2018Work_Projects\u2019 exists on my desktop",
+            "files"
+        ],
+        [
+            "Create a bash script to monitor CPU usage",
+            "code"
+        ],
+        [
+            "Search online for the best budget smartphones of 2025",
+            "web"
+        ],
+        [
+            "What\u2019s the strangest food combination you\u2019ve heard of?",
+            "talk"
+        ],
+        [
+            "Move all .txt files from Downloads to a new folder called Notes",
+            "files"
+        ],
+        [
+            "Debug this C++ code that keeps crashing",
+            "code"
+        ],
+        [
+            "can you browse the web to find out who fosowl is ?",
+            "web"
+        ],
+        [
+            "Find the file \u2018important_notes.txt\u2019",
+            "files"
+        ],
+        [
+            "Find out the latest news on the upcoming Mars mission",
+            "web"
+        ],
+        [
+            "Write a Java program to calculate the area of a circle",
+            "code"
+        ],
+        [
+            "Search the web for the best ways to learn a new language",
+            "web"
+        ],
+        [
+            "Locate the file \u2018presentation.pptx\u2019 in my Documents folder",
+            "files"
+        ],
+        [
+            "Write a Python script to download all images from a webpage",
+            "code"
+        ],
+        [
+            "Search the web for the latest trends in AI and machine learning",
+            "web"
+        ],
+        [
+            "Tell me about a time when you had to solve a difficult problem",
+            "talk"
+        ],
+        [
+            "Organize all image files on my desktop into a folder called \u2018Pictures\u2019",
+            "files"
+        ],
+        [
+            "Generate a Ruby script to calculate Fibonacci numbers up to 100",
+            "code"
+        ],
+        [
+            "Find out what device are connected to my network",
+            "code"
+        ],
+        [
+            "Show me how much disk space is left on my drive",
+            "code"
+        ],
+        [
+            "Look up recent posts on X about climate change",
+            "web"
+        ],
+        [
+            "Find the photo I took last week named sunset_beach.jpg",
+            "files"
+        ],
+        [
+            "Write a JavaScript snippet to fetch data from an API",
+            "code"
+        ],
+        [
+            "Search the web for tutorials on machine learning with Python",
+            "web"
+        ],
+        [
+            "Locate the file \u2018meeting_notes.docx\u2019 in my Documents folder",
+            "files"
+        ],
+        [
+            "Write a Python script to scrape a website\u2019s title and links",
+            "code"
+        ],
+        [
+            "Search the web for the latest breakthroughs in fusion energy",
+            "web"
+        ],
+        [
+            "Tell me about a historical event that sounds too wild to be true",
+            "talk"
+        ],
+        [
+            "Organize all image files on my desktop into a folder called \u2018Pictures\u2019",
+            "files"
+        ],
+        [
+            "Generate a Ruby script to calculate Fibonacci numbers up to 100",
+            "code"
+        ],
+        [
+            "Find recent X posts about SpaceX\u2019s next rocket launch",
+            "web"
+        ],
+        [
+            "What\u2019s the funniest misunderstanding you\u2019ve seen between humans and AI?",
+            "talk"
+        ],
+        [
+            "Check if \u2018backup_032025.zip\u2019 exists anywhere on my drive",
+            "files"
+        ],
+        [
+            "Create a shell script to automate backups of a directory",
+            "code"
+        ],
+        [
+            "Look up the top AI conferences happening in 2025 online",
+            "web"
+        ],
+        [
+            "Write a C# program to simulate a basic calculator",
+            "code"
+        ],
+        [
+            "Browse the web for open-source alternatives to Photoshop",
+            "web"
+        ],
+        [
+            "Hey how are you",
+            "talk"
+        ],
+        [
+            "Write a Python script to ping a website",
+            "code"
+        ],
+        [
+            "Search the web for the latest iPhone release",
+            "web"
+        ],
+        [
+            "What\u2019s the weather like today?",
+            "web"
+        ],
+        [
+            "Hi, how\u2019s your day going?",
+            "talk"
+        ],
+        [
+            "Can you find a file called resume.docx on my drive?",
+            "files"
+        ],
+        [
+            "Write a simple Java program to print 'Hello World'",
+            "code"
+        ],
+        [
+            "can you find the current stock of Tesla?",
+            "web"
+        ],
+        [
+            "Tell me a quick joke",
+            "talk"
+        ],
+        [
+            "Search online for the best coffee shops in Seattle",
+            "web"
+        ],
+        [
+            "Check if \u2018project_plan.pdf\u2019 exists in my Downloads folder",
+            "files"
+        ],
+        [
+            "What\u2019s your favorite color?",
+            "talk"
+        ],
+        [
+            "Write a bash script to list all files in a directory",
+            "code"
+        ],
+        [
+            "Find recent X posts about electric cars",
+            "web"
+        ],
+        [
+            "Hey, you doing okay?",
+            "talk"
+        ],
+        [
+            "Locate the file \u2018family_photo.jpg\u2019 on my system",
+            "files"
+        ],
+        [
+            "Search the web for beginner guitar lessons",
+            "web"
+        ],
+        [
+            "Write a Python function to reverse a string",
+            "code"
+        ],
+        [
+            "What\u2019s the weirdest animal you know of?",
+            "talk"
+        ],
+        [
+            "Organize all .pdf files on my desktop into a \u2018Documents\u2019 folder",
+            "files"
+        ],
+        [
+            "Browse the web for the latest space mission updates",
+            "web"
+        ],
+        [
+            "Hey, what\u2019s up with you today?",
+            "talk"
+        ],
+        [
+            "Write a JavaScript function to add two numbers",
+            "code"
+        ],
+        [
+            "Find the file \u2018notes.txt\u2019 in my Documents folder",
+            "files"
+        ],
+        [
+            "Tell me something random about the ocean",
+            "talk"
+        ],
+        [
+            "Search the web for cheap flights to Paris",
+            "web"
+        ],
+        [
+            "Check if \u2018budget.xlsx\u2019 is on my drive",
+            "files"
+        ],
+        [
+            "Write a Python script to count words in a text file",
+            "code"
+        ],
+        [
+            "How\u2019s it going today?",
+            "talk"
+        ],
+        [
+            "Find recent X posts about AI advancements",
+            "web"
+        ],
+        [
+            "Move all .jpg files from Downloads to a \u2018Photos\u2019 folder",
+            "files"
+        ],
+        [
+            "Search online for the best laptops of 2025",
+            "web"
+        ],
+        [
+            "What\u2019s the funniest thing you\u2019ve heard lately?",
+            "talk"
+        ],
+        [
+            "Write a Ruby script to generate random numbers",
+            "code"
+        ],
+        [
+            "Hey, how\u2019s everything with you?",
+            "talk"
+        ],
+        [
+            "Locate \u2018meeting_agenda.docx\u2019 in my system",
+            "files"
+        ],
+        [
+            "Search the web for tips on growing indoor plants",
+            "web"
+        ],
+        [
+            "Write a C++ program to calculate the sum of an array",
+            "code"
+        ],
+        [
+            "Tell me a fun fact about dogs",
+            "talk"
+        ],
+        [
+            "Check if the folder \u2018Old_Projects\u2019 exists on my desktop",
+            "files"
+        ],
+        [
+            "Browse the web for the latest gaming console reviews",
+            "web"
+        ],
+        [
+            "Hi, how are you feeling today?",
+            "talk"
+        ],
+        [
+            "Write a Python script to check disk space",
+            "code"
+        ],
+        [
+            "Find the file \u2018vacation_itinerary.pdf\u2019 on my drive",
+            "files"
+        ],
+        [
+            "Search the web for news on renewable energy",
+            "web"
+        ],
+        [
+            "What\u2019s the strangest thing you\u2019ve learned recently?",
+            "talk"
+        ],
+        [
+            "Organize all video files into a \u2018Videos\u2019 folder",
+            "files"
+        ],
+        [
+            "Write a shell script to delete temporary files",
+            "code"
+        ],
+        [
+            "Hey, how\u2019s your week been so far?",
+            "talk"
+        ],
+        [
+            "Search online for the top movies of 2025",
+            "web"
+        ],
+        [
+            "Locate \u2018taxes_2024.xlsx\u2019 in my Documents folder",
+            "files"
+        ],
+        [
+            "Tell me about a cool invention from history",
+            "talk"
+        ],
+        [
+            "Write a Java program to check if a number is even or odd",
+            "code"
+        ],
+        [
+            "Find recent X posts about cryptocurrency trends",
+            "web"
+        ],
+        [
+            "Hey, you good today?",
+            "talk"
+        ],
+        [
+            "Search the web for easy dinner recipes",
+            "web"
+        ],
+        [
+            "Check if \u2018photo_backup.zip\u2019 exists on my drive",
+            "files"
+        ],
+        [
+            "Write a Python script to rename files with a timestamp",
+            "code"
+        ],
+        [
+            "What\u2019s your favorite thing about space?",
+            "talk"
+        ],
+        [
+            "search for GPU with at least 24gb vram",
+            "web"
+        ],
+        [
+            "Browse the web for the latest fitness trends",
+            "web"
+        ],
+        [
+            "Move all .docx files to a \u2018Work\u2019 folder",
+            "files"
+        ],
+        [
+            "I would like to make a new project called 'new_project'",
+            "files"
+        ],
+        [
+            "I would like to setup a new project index as mark2",
+            "files"
+        ],
+        [
+            "can you create a 3d js game that run in the browser",
+            "code"
+        ],
+        [
+            "can you make a web app in python that use the flask framework",
+            "code"
+        ],
+        [
+            "can you build a web server in go that serve a simple html page",
+            "code"
+        ],
+        [
+            "can you find out who Jacky yougouri is ?",
+            "web"
+        ],
+        [
+            "Can you use MCP to find stock market for IBM ?",
+            "mcp"
+        ],
+        [
+            "Can you use MCP to to export my contacts to a csv file?",
+            "mcp"
+        ],
+        [
+            "Can you use a MCP to find write notes to flomo",
+            "mcp"
+        ],
+        [
+            "Can you use a MCP to query my calendar and find the next meeting?",
+            "mcp"
+        ],
+        [
+            "Can you use a mcp to get the distance between Shanghai and Paris?",
+            "mcp"
+        ],
+        [
+            "Setup a new flutter project called 'new_flutter_project'",
+            "files"
+        ],
+        [
+            "can you create a new project called 'new_project'",
+            "files"
+        ],
+        [
+            "can you make a simple web app that display a list of files in my dir",
+            "code"
+        ],
+        [
+            "can you build a simple web server in python that serve a html page",
+            "code"
+        ],
+        [
+            "find and buy me the latest rtx 4090",
+            "web"
+        ],
+        [
+            "What are some good netflix show like Altered Carbon ?",
+            "web"
+        ],
+        [
+            "can you find the latest research paper on AI",
+            "web"
+        ],
+        [
+            "can you find research.pdf in my drive",
+            "files"
+        ],
+        [
+            "hi",
+            "talk"
+        ],
+        [
+            "hello",
+            "talk"
+        ]
+    ]
+}

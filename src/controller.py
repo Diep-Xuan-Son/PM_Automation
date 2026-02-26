@@ -8,6 +8,7 @@ from string import ascii_letters, digits, punctuation
 from app import *
 from models import Message
 
+from tasks import celery_app, route_vote
 
 @app.post("/api/sendMessage")
 @HTTPException() 
@@ -50,6 +51,30 @@ async def health_check():
     #     health_status["status"] = "error"
     #     health_status["redis"] = "unreachable"
     return health_status
+
+@app.post("/router")
+async def run_task(session_id: str, text: str):
+    print(session_id)
+    print(text)
+    # task_result = celery_app.send_task("app.tasks.router", args=[session_id, text])
+    # return {"task_result": task_result}
+    task = route_vote.apply_async(args=[session_id, text])
+    return {
+        "task_id": task.id,
+        "status": "queued"
+    }
+
+@app.get("/task_status/{task_id}")
+async def get_task_status(task_id: str):
+    res = celery_app.AsyncResult(task_id)
+
+    return {
+        "task_id": task_id,
+        "ready": res.ready(),
+        "successful": res.successful(),
+        "status": res.status,
+        "result": res.result if res.ready() else None
+    }
 
 if __name__=="__main__":
     host = "0.0.0.0"

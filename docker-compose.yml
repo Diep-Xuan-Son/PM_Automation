@@ -1,0 +1,27 @@
+version: '3'
+networks:
+  mynetwork:
+    driver: bridge
+services:
+
+  redis:
+    image: redis/redis-stack:latest
+    container_name: mmv_redis
+    restart: always
+    environment:
+      - REDIS_ARGS=--requirepass root
+    ports: 
+      - "6446:6446"
+    volumes:
+      - ./redis_data:/data
+      - ./redis_config/redis1.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      mynetwork:
+    profiles:
+      - redis
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+
+# docker compose -f docker-compose.yml --profile dev1 up -d
+# docker compose -f docker-compose.yml --profile "*" up -d
+# docker compose -f docker-compose.yml --profile triton_server up -d

@@ -6,7 +6,7 @@ import requests
 from contextlib import asynccontextmanager
 from fastapi.staticfiles import StaticFiles
 from fastapi.encoders import jsonable_encoder
-from confluent_kafka.admin import AdminClient
+# from confluent_kafka.admin import AdminClient
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Union, Tuple, Optional, Type
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -42,13 +42,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-res = requests.request("POST", "http://192.168.6.189:3333/api/auth/login", 
-    headers={'Content-Type': 'application/json'}, 
-    data=json.dumps({
-        "username": "admin",
-        "password": "admin123", 
-    })
-)
-if res.status_code == 201:
-    print("Login success!")
-    ACCESS_TOKEN = res.json()['accessToken']
+# res = requests.request("POST", "http://192.168.6.189:3333/api/auth/login", 
+#     headers={'Content-Type': 'application/json'}, 
+#     data=json.dumps({
+#         "username": "admin",
+#         "password": "admin123", 
+#     })
+# )
+# if res.status_code == 201:
+#     print("Login success!")
+#     ACCESS_TOKEN = res.json()['accessToken']
