@@ -20,8 +20,13 @@ celery_app.conf.update(
     result_serializer="json",
     accept_content=["json"],
     timezone="Asia/Ho_Chi_Minh",
-    enable_utc=False,
+    enable_utc=True,
+    task_track_started=True,
+    task_ignore_result=False,
     worker_concurrency=2,
+    broker_pool_limit=0,
+    task_time_limit=120,       # hard limit (seconds)
+    task_soft_time_limit=60,  # soft limit (seconds)
     # task_track_started=True,
     # task_time_limit=300,
     # worker_prefetch_multiplier=1,
